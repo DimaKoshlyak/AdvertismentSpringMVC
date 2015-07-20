@@ -1,6 +1,7 @@
 package ua.kiev.dk.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import ua.kiev.dk.entities.Advertisement;
 import ua.kiev.dk.entities.Photo;
 
@@ -8,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
 
+@Transactional
 public class AdvDAOImpl implements AdvDAO {
 
     @Autowired
@@ -105,10 +107,8 @@ public class AdvDAOImpl implements AdvDAO {
         }
     }
 
-
-//    @Override
-//    @Transactional
-//        public void merge(Advertisement adv) {
-//        entityManager.merge(adv);
-//    }
+    @Override
+        public void merge(Advertisement adv) {
+        entityManager.merge(adv);
+    }
 }

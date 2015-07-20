@@ -6,10 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import ua.kiev.prog.AdvDAO;
-import ua.kiev.prog.Advertisement;
-import ua.kiev.prog.AdvertisementList;
-import ua.kiev.prog.Photo;
+import ua.kiev.dk.dao.AdvDAO;
+import ua.kiev.dk.entities.Advertisement;
+import ua.kiev.dk.entities.AdvertisementList;
+import ua.kiev.dk.entities.Photo;
+import ua.kiev.dk.services.AdvManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,9 +29,12 @@ public class MainController {
 	@Autowired
 	private AdvDAO advDAO;
 
+	@Autowired
+	private AdvManager advManager;
+
 	@RequestMapping("/")
 	public ModelAndView listAdvs() {
-		return new ModelAndView("index", "advs", advDAO.list());
+		return new ModelAndView("index", "advs", advManager.list());
 	}
 
 	@RequestMapping(value = "/add_page", method = RequestMethod.POST)
@@ -46,19 +50,20 @@ public class MainController {
 		return new ModelAndView("index", "advs", advDAO.list(pattern));
 	}
 
-	@RequestMapping("/move_to_trash")
-	public ModelAndView moveToTrash(@RequestParam(value="id") long id) {
-		advDAO.moveToTrash(id);
-		return new ModelAndView("index", "advs", advDAO.list());
-	}
-
 //	@RequestMapping("/move_to_trash")
-//	public ModelAndView moveToTrash(@RequestParam(value = "id") long id){
-//		Advertisement adv = advDAO.getAdv(id);
-//		adv.setTo_del(true);
-//		advDAO.merge(adv);
+//	public ModelAndView moveToTrash(@RequestParam(value="id") long id) {
+//		advDAO.moveToTrash(id);
 //		return new ModelAndView("index", "advs", advDAO.list());
 //	}
+
+	@RequestMapping("/move_to_trash")
+	public ModelAndView moveToTrash(@RequestParam(value = "id") long id){
+		Advertisement adv = advDAO.getAdv(id);
+		adv.setTo_del(true);
+		System.out.println("Start merging");
+		System.out.println("is to del = " + adv.isTo_del());
+		return new ModelAndView("index", "advs", advDAO.list());
+	}
 
 	@RequestMapping(value = "/process_checked", method = RequestMethod.POST)
 	public ModelAndView processChecked(HttpServletRequest request) {

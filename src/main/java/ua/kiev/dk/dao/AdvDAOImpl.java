@@ -37,6 +37,7 @@ public class AdvDAOImpl implements AdvDAO {
     @Override
     public void add(Advertisement adv) {
         try {
+            adv.setTo_del(false);
             entityManager.getTransaction().begin();
             entityManager.persist(adv);
             entityManager.getTransaction().commit();

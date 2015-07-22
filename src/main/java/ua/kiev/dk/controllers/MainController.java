@@ -10,7 +10,6 @@ import ua.kiev.dk.dao.AdvDAO;
 import ua.kiev.dk.entities.Advertisement;
 import ua.kiev.dk.entities.AdvertisementList;
 import ua.kiev.dk.entities.Photo;
-import ua.kiev.dk.services.AdvManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,12 +28,9 @@ public class MainController {
 	@Autowired
 	private AdvDAO advDAO;
 
-	@Autowired
-	private AdvManager advManager;
-
 	@RequestMapping("/")
 	public ModelAndView listAdvs() {
-		return new ModelAndView("index", "advs", advManager.list());
+		return new ModelAndView("index", "advs", advDAO.list());
 	}
 
 	@RequestMapping(value = "/add_page", method = RequestMethod.POST)
@@ -50,20 +46,20 @@ public class MainController {
 		return new ModelAndView("index", "advs", advDAO.list(pattern));
 	}
 
-//	@RequestMapping("/move_to_trash")
-//	public ModelAndView moveToTrash(@RequestParam(value="id") long id) {
-//		advDAO.moveToTrash(id);
-//		return new ModelAndView("index", "advs", advDAO.list());
-//	}
-
 	@RequestMapping("/move_to_trash")
-	public ModelAndView moveToTrash(@RequestParam(value = "id") long id){
-		Advertisement adv = advDAO.getAdv(id);
-		adv.setTo_del(true);
-		System.out.println("Start merging");
-		System.out.println("is to del = " + adv.isTo_del());
+	public ModelAndView moveToTrash(@RequestParam(value="id") long id) {
+		advDAO.moveToTrash(id);
 		return new ModelAndView("index", "advs", advDAO.list());
 	}
+
+//	@RequestMapping("/move_to_trash")
+//	public ModelAndView moveToTrash(@RequestParam(value = "id") long id){
+//		Advertisement adv = advDAO.getAdv(id);
+//		adv.setTo_del(true);
+//		System.out.println("Start merging");
+//		System.out.println("is to del = " + adv.isTo_del());
+//		return new ModelAndView("index", "advs", advDAO.list());
+//	}
 
 	@RequestMapping(value = "/process_checked", method = RequestMethod.POST)
 	public ModelAndView processChecked(HttpServletRequest request) {
@@ -106,6 +102,7 @@ public class MainController {
 					name, shortDesc, longDesc, phone, price,
 					photo.isEmpty() ? null : new Photo(photo.getOriginalFilename(), photo.getBytes())
 			);
+			adv.setTo_del(false);
 			advDAO.add(adv);
 			return new ModelAndView("index", "advs", advDAO.list());
 		} catch (IOException ex) {
@@ -128,7 +125,7 @@ public class MainController {
 		Unmarshaller unmarshaller = null;
 		AdvertisementList advList = null;
 		try {
-			jaxbContext = JAXBContext.newInstance(Advertisement.class);
+			jaxbContext = JAXBContext.newInstance(AdvertisementList.class);
 			unmarshaller = jaxbContext.createUnmarshaller();
 			advList = (AdvertisementList) unmarshaller.unmarshal(reader);
 		} catch (JAXBException e) {
@@ -137,6 +134,6 @@ public class MainController {
 		for (Advertisement adv : advList.getAdvList()) {
 			advDAO.add(adv);
 		}
-		return new ModelAndView("info", "advs", advDAO.list());
+		return new ModelAndView("index", "advs", advDAO.list());
 	}
 }

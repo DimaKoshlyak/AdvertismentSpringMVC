@@ -1,35 +1,27 @@
-package ua.kiev.dk.app;
+package ua.kiev.dk.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import ua.kiev.dk.dao.AdvDAO;
-import ua.kiev.dk.dao.AdvDAOImpl;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
+/**
+ * Created by d.koshlyak on 24.07.2015.
+ */
 @Configuration
-
 @ComponentScan("ua.kiev.dk")
 @EnableWebMvc
-public class AppConfig {
-    @Bean
-    public EntityManager entityManager() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("AdvJPA");
-        return emf.createEntityManager();
-    }
+public class MVCContext extends WebMvcConfigurerAdapter{
 
-    @Bean
-    public AdvDAO advDAO() {
-        return new AdvDAOImpl();
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
     }
-
 
     @Bean
     public UrlBasedViewResolver setupViewResolver() {

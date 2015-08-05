@@ -8,14 +8,8 @@ import java.util.List;
 @XmlRootElement(name = "advertisements")
 public class AdvertisementList {
 
-
-
         @XmlElement(name = "advertisement")
         private List<Advertisement> advList = new ArrayList<Advertisement>();
-
-        public void addAdv(Advertisement adv) {
-            advList.add(adv);
-        }
 
         public AdvertisementList() {
         }

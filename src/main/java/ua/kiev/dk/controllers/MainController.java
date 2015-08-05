@@ -12,13 +12,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import ua.kiev.dk.entities.Advertisement;
+import ua.kiev.dk.entities.AdvertisementList;
 import ua.kiev.dk.entities.Photo;
-import ua.kiev.dk.Services.AdvManager;
 import ua.kiev.dk.repo.PhotoRepo;
+import ua.kiev.dk.services.AdvManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.InputStreamReader;
 
 @Controller
 @RequestMapping("/SpringMVC")
@@ -106,29 +113,30 @@ public ModelAndView addAdv(@RequestParam(value="name") String name,
 	}
 }
 
-//	@RequestMapping("/load_xml")
-//	public ModelAndView importXml(@RequestParam(value = "xmlfile") MultipartFile mfile) {
-//		InputStream inputStream = null;
-//		Reader reader = null;
-//		try {
-//			inputStream = mfile.getInputStream();
-//			reader = new InputStreamReader(inputStream, "UTF-8");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		JAXBContext jaxbContext = null;
-//		Unmarshaller unmarshaller = null;
-//		AdvertisementList advList = null;
-//		try {
-//			jaxbContext = JAXBContext.newInstance(AdvertisementList.class);
-//			unmarshaller = jaxbContext.createUnmarshaller();
-//			advList = (AdvertisementList) unmarshaller.unmarshal(reader);
-//		} catch (JAXBException e) {
-//			e.printStackTrace();
-//		}
-//		for (Advertisement adv : advList.getAdvList()) {
-//			advDAO.add(adv);
-//		}
-//		return new ModelAndView("index", "advs", advDAO.list());
-//	}
+	@RequestMapping("/load_xml")
+	public ModelAndView importXml(@RequestParam(value = "xmlfile") MultipartFile mfile) {
+		InputStream inputStream = null;
+		Reader reader = null;
+		try {
+			inputStream = mfile.getInputStream();
+			reader = new InputStreamReader(inputStream, "UTF-8");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		JAXBContext jaxbContext = null;
+		Unmarshaller unmarshaller = null;
+		AdvertisementList advList = null;
+		try {
+			jaxbContext = JAXBContext.newInstance(AdvertisementList.class);
+			unmarshaller = jaxbContext.createUnmarshaller();
+			advList = (AdvertisementList) unmarshaller.unmarshal(reader);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		for (Advertisement adv : advList.getAdvList()) {
+			adv.setTo_del(false);
+			advManager.add(adv);
+		}
+		return new ModelAndView("index", "advs", advManager.list());
+	}
 }
